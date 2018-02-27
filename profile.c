@@ -80,6 +80,40 @@ depth_profile_t* gen_chl_prof(
     return prof;
 }
 
+time_profile_t* gen_time_prof(double sunrise, int count) {
+    time_profile_t *prof;
+    prof = (time_profile_t*)malloc(sizeof(time_profile_t));
+    prof->sunrise = sunrise;
+    prof->count = count;
+    prof->values = (double*)malloc(sizeof(double) * (size_t)prof->count);
+
+    double delta_t;
+    delta_t = (12.0 - sunrise) / count;
+
+    int i;
+    for (i = 0; i < count; ++i) {
+        prof->values[i] = sunrise + delta_t * i;
+    }
+
+    return prof;
+}
+
+wavelength_array_t* gen_wavelength_array(double start, double step, int count) {
+    wavelength_array_t *prof;
+    prof = (wavelength_array_t*)malloc(sizeof(wavelength_array_t));
+    prof->start = start;
+    prof->step = step;
+    prof->count = count;
+    prof->values = (double*)malloc(sizeof(double) * (size_t)prof->count);
+
+    int i;
+    for (i = 0; i < prof->count; ++i){
+        prof->values[i] = start + i * step;
+    }
+
+    return prof;
+}
+
 double B0_from_surface_chl(double chl, double rho, double zm, double sigma) {
     return chl / (1 + (rho / (1 - rho)) * exp(-pow(zm, 2) / (2 * pow(sigma, 2))) );
 }
