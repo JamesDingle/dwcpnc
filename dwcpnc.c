@@ -34,6 +34,15 @@ float calc_pixel_pp(dwcpn_params_t *dwcpn_params, req_data_t *inp_data) {
     wavelength_array_t* wl_array = gen_wavelength_array(400.0, 5.0, 61);
     double* zen_rad_arr = zenith_array_from_times(tprof, inp_data->julday, inp_data->lat);
 
+    // Because the transmittance coefficients are only provided at 24 wavelengths
+    // we will calculate for those only and then interpolate up to the full set of
+    // 61 wavelengths afterwards
+    wavelength_array_t* wl_trans_arr = (wavelength_array_t*)malloc(sizeof(wavelength_array_t));
+    wl_trans_arr->count = 24;
+    wl_trans_arr->values = (double[24]){400., 410., 420., 430., 440., 450., 460., 470.,
+                                        480., 490., 500., 510., 520., 530., 540., 550.,
+                                        570., 593., 610., 630., 656., 667.6, 690., 710.};
+
     // start to loop over each time step now
     int t_idx;
     for (t_idx = 0; t_idx < tprof->count; ++t_idx){
@@ -46,10 +55,24 @@ float calc_pixel_pp(dwcpn_params_t *dwcpn_params, req_data_t *inp_data) {
             zen_rad = zen_deg * (M_PI / 180.0);
         }
 
+
+        // compute direct/diffuse irradiance
         double airmass = compute_airmass(zen_rad, zen_deg);
 
+        double* ta = compute_aerosol_transmittance(wl_trans_arr, airmass);
+        double* tr = compute_rayleigh(airmass, wl_trans_arr);
+        double* tw = compute_water_vapour_transmittance(wl_trans_arr, airmass);
+        double* to = compute_ozone_transmittance(wl_trans_arr, airmass, zen_rad);
+        double tu = compute_tu(airmass);
 
+        double* ro_s = compute_air_albedo(wl_trans_arr, ta, to, tr, tu, tw);
 
+        double* direct = compute_direct_irradiance(wl_trans_arr, ta, to, tr, tu, tw);
+
+//        int i;
+//        for (i = 0; i < wl_trans_arr->count; ++i) {
+//            printf("%d: ro_s: %f\n",i, ro_s[i]);
+//        }
     }
 
 //    int i;
