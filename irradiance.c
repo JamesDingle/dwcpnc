@@ -66,8 +66,8 @@ double* compute_ozone_transmittance(wavelength_array_t *wl_array, double airmass
     int i;
     for (i = 0; i < wl_array->count; ++i) {
         em0 = 35.0 / pow((1224.0 * pow(cos(zenith_r), 2.0) + 1.0), 0.5);
-        to[i] = exp(-AO[i] * 0.03 * em0);
-//        to[i] = exp(-AO[i] * 0.344 * em0); // to be uncommented once equivalency tests are done
+//        to[i] = exp(-AO[i] * 0.03 * em0);
+        to[i] = exp(-AO[i] * 0.344 * em0); // to be uncommented once equivalency tests are done
     }
     return to;
 }
@@ -89,7 +89,6 @@ double* compute_air_albedo(wavelength_array_t *wl_array, double* ta, double* to,
 
 double* compute_direct_irradiance(wavelength_array_t *wl_array, double* ta, double* to, double* tr, double tu, double* tw){
     double* direct = (double*)malloc(sizeof(double) * wl_array->count);
-
     // note EXTSPIR is Extra-Terrestrial spectral irradiance
 
     int i;
@@ -101,34 +100,142 @@ double* compute_direct_irradiance(wavelength_array_t *wl_array, double* ta, doub
     return direct;
 }
 
-double* compute_diffuse_irradiance(wavelength_array_t *wl_array, double zenith_d, double zenith_r, double* ta, double* to, double* tr, double tu, double* tw){
-    double* c = c_array_lookup(zenith_d);
+double* compute_diffuse_irradiance(wavelength_array_t *wl_array, double zenith_d, double zenith_r, const double* direct, const double* ro_s, const double* ta, const double* to, const double* tr, double tu, const double* tw){
+    double* diffuse = (double*)malloc(sizeof(double) * wl_array->count);
+
+    double* zen_lut = (double[7]){0., 37., 48.19, 60., 70., 75., 80.};
+
+    int c_idx = find_zenith_array_pos(zenith_d, zen_lut, 7);
+    double* c = c_array_lookup(c_idx);
+
+    double* cm1 = c_array_lookup(c_idx-1);
+
+    double fraction;
+    fraction = (zenith_d - zen_lut[c_idx - 1]) / (zen_lut[c_idx] - zen_lut[c_idx - 1]);
+
+    double* c1 = (double*)malloc(sizeof(double) * 5); // compute along the 5 wavelengths in the LUT
 
     int i;
-    for (i = 0; i < 7; ++i) {
-
+    for (i = 0; i < 5; ++i) {
+        c1[i] = (c[i] - cm1[i]) * fraction + cm1[i];
     }
+
+    double* c2 = (double*)malloc(sizeof(double) * wl_array->count);
+    double cinc;
+    int l_in, l_out, l;
+
+    c2[0] = c1[0];
+    l = 0;
+
+    for (l_out = 1; l_out < 4; ++l_out){
+        cinc = (c1[l_out-1] - c1[l_out]) / 5.0;
+        for (l_in = 0; l_in < 5; ++l_in) {
+            l = l + 1;
+            c2[l] = c2[l - 1] - cinc;
+        }
+    }
+
+    double cdif = c1[4] - c1[3];
+    double wldif = 160.0;
+    double wlinc;
+
+    for (l_out = 16; l_out < 24; ++l_out) {
+        wlinc = (wl_array->values[l_out] - wl_array->values[l_out-1]) / wldif;
+        cinc = cdif * wlinc;
+        l = l + 1;
+        c2[l] = c2[l - 1] + cinc;
+    }
+
+    double xx, r, a, g;
+
+    for (l = 0; l < 24; ++l) {
+        xx= EXTSPIR[l] * cos(zenith_r) * to[l] * tw[l];
+        r = xx * ta[l] * (1.0 - tr[l]) * 0.5;
+        a = xx * tr[l] * (1.0 - ta[l]) * 0.928 * 0.82;
+
+        if (l == 23) {
+            r = r * tu;
+            a = a * tu;
+        }
+
+        g = (direct[l] * cos(zenith_r) + (r + a) * c2[l]) * ro_s[l] * 0.05 /
+                            (1.0 - 0.05 * ro_s[l]);
+
+        diffuse[l] = (r + a) * c2[l] + g;
+    }
+    free(c1); c1=NULL;
+    free(c2); c2=NULL;
+    free(c); c=NULL;
+    free(cm1);cm1=NULL;
+    return diffuse;
 }
 
-double* c_array_lookup(double zenith_d, int* idx) {
-    double* c;
+int find_zenith_array_pos(double zenith_d, const double* zen_array, int num) {
+    int i;
+    for (i = 0; i < num; ++i){
+        if (zenith_d < zen_array[i]) {
+            return i;
+        }
+    }
+    return num;
+}
 
-    // this is icky and hardcoded but since its such a small LUT I have just made an if statement
-    if (zenith_d < 0.0) {
-        c = (double[5]){1.11, 1.04, 1.15, 1.12, 1.32};
-    } else if (zenith_d < 37.0) {
-        c = (double[5]){1.13, 1.05, 1.00, 0.96, 1.12};
-    } else if (zenith_d < 48.19) {
-        c = (double[5]){1.18, 1.09, 1.00, 0.96, 1.07};
-    } else if (zenith_d < 60.0) {
-        c = (double[5]){1.24, 1.11, 0.99, 0.94, 1.02};
-    } else if (zenith_d < 70.0) {
-        c = (double[5]){1.46, 1.24, 1.06, 0.99, 1.10};
-    } else if (zenith_d < 75.0) {
-        c = (double[5]){1.70, 1.34, 1.07, 0.96, 0.90};
-    } else if (zenith_d <= 80.0) {
-        c = (double[5]){2.61, 1.72, 1.22, 1.04, 0.80};
+double* c_array_lookup(int index) {
+
+    double* c_array = (double[35]){
+            1.11, 1.04, 1.15, 1.12, 1.32,
+            1.13, 1.05, 1.00, 0.96, 1.12,
+            1.18, 1.09, 1.00, 0.96, 1.07,
+            1.24, 1.11, 0.99, 0.94, 1.02,
+            1.46, 1.24, 1.06, 0.99, 1.10,
+            1.70, 1.34, 1.07, 0.96, 0.90,
+            2.61, 1.72, 1.22, 1.04, 0.80
+    };
+
+    double* ret_array = (double*)malloc(sizeof(double) * 5);
+
+    int i;
+    for (i = 0; i < 5; ++i) {
+        ret_array[i] = c_array[(index * 5) + i];
     }
 
-    return c;
+    return ret_array;
+
+}
+
+// TODO: (James) this is a stupid function and assumes that there will always be 61 even wavelengths from 400nm
+// write an updated version of this to accept two wavelength arrays and interpolate one to the other
+double* interpolate_irradiances(wavelength_array_t *wl_array, const double* irradiance) {
+
+    double* output = (double*) malloc(sizeof(double) * 61);
+
+    output[0] = irradiance[0]; // first element is correct
+
+    int l = 1;
+    int l1 = 1;
+    int length = 405;
+
+    double fraction;
+    double dif;
+
+    while (l < 61) {
+        if (length >= wl_array->values[l1+1]) {
+            l1 = l1 + 1;
+        } else {
+            fraction = (length - wl_array->values[l1]) / (wl_array->values[l1+1] - wl_array->values[l1]);
+            dif = irradiance[l1 + 1]  - irradiance[l1];
+            output[l] = irradiance[l1] + dif * fraction;
+            l = l + 1;
+            length = length + 5;
+        }
+    }
+
+//    printf("Interp: [");
+//    for (l = 0; l < 61; ++l) {
+//        printf("%.2f,", output[l]);
+//    }
+//    printf("]\n");
+
+    return output;
+
 }
