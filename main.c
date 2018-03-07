@@ -23,24 +23,44 @@ int main() {
     req_data_t *tpos;
     tpos = (req_data_t*)malloc(sizeof(req_data_t));
 
-    tpos->lat = 34.95833206;
-    tpos->lon = -10.04166698;
+    tpos->lat = 35.9583343498;
+    tpos->lon = -5.7083331719;
     tpos->julday = 15;
-    tpos->alpha_b = 0.03224407136440277;
-    tpos->pm_b = 2.13877010345459;
-    tpos->zm = 60.28186714542189;
-    tpos->b0 = 0.1298753627732041;
-    tpos->h = 46.99779480845467;
-    tpos->sigma = 31.983231597845602;
+    tpos->bathymetry = -360.2880859375;
+    tpos->alpha_b = 0.0585016608;
+    tpos->pm_b = 4.3047113419;
+    tpos->zm = 4.3246043165;
+    tpos->b0 = 0.1989055441;
+    tpos->rho = 0.7597410072;
+    tpos->h = 67.2604851113;
+    tpos->sigma = 42.6616115108;
     tpos->cloud = 0.0;
     tpos->yel_sub = 0.3;
-    tpos->sat_par = 18.708280563354492;
+    tpos->sat_par = 15.2781600952;
+//
+//    tpos->lat = 35.5416676714;
+//    tpos->lon = -6.1249998268;
+//    tpos->julday = 15;
+//    tpos->bathymetry = -61.4626770020;
+//    tpos->alpha_b = 0.0412193872;
+//    tpos->pm_b = 3.0254180431;
+//    tpos->zm = 3.0448300654;
+//    tpos->b0 = 0.7429472239;
+//    tpos->rho = 0.7610457516;
+//    tpos->h = 261.2296164441;
+//    tpos->sigma = 44.0431633987;
+//    tpos->cloud = 0.0;
+//    tpos->yel_sub = 0.3;
+//    tpos->sat_par = 15.6864595413;
+
 
     calc_pixel_pp(dwcpn_params, tpos);
 
     float end_time = (float)clock() / CLOCKS_PER_SEC;
 
-    printf("Time elapsed: %f", end_time-start_time);
+    printf("Time elapsed: %f\n", end_time-start_time);
 
+    free(tpos);
+    free(dwcpn_params);
 }
 

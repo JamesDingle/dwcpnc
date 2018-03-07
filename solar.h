@@ -23,5 +23,5 @@ static int SolIr[25] = {1399,1399,1393,1389,1378,1364,1355,1353,
 double compute_sunrise(int jday, double lat);
 double* zenith_array_from_times(time_profile_t *tprof, int julday, double lat);
 double compute_zenith(double local_time, double delta, double phi);
-
+double thekaekara_correction(int jul_day);
 #endif //DWCPNC_SOLAR_H

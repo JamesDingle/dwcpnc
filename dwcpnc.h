@@ -21,12 +21,14 @@ typedef struct {
     double lat;
     double lon;
     int julday;
+    double bathymetry;
     double alpha_b;
     double pm_b;
     double zm;
     double b0;
     double h;
     double sigma;
+    double rho;
     double cloud;
     double yel_sub;
     double sat_par;

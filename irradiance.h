@@ -43,5 +43,8 @@ double* compute_ozone_transmittance(wavelength_array_t *wl_array, double airmass
 double compute_tu(double airmass);
 double* compute_air_albedo(wavelength_array_t *wl_array, double* ta, double* to, double* tr, double tu, double* tw);
 double* compute_direct_irradiance(wavelength_array_t *wl_array, double* ta, double* to, double* tr, double tu, double* tw);
-double* c_array_lookup(double zenith_d,  int* idx);
+int find_zenith_array_pos(double zenith_d, const double* zen_array, int len);
+double* c_array_lookup(int idx);
+double* compute_diffuse_irradiance(wavelength_array_t *wl_array, double zenith_d, double zenith_r, const double* direct, const double* ro_s, const double* ta, const double* to, const double* tr, double tu, const double* tw);
+double* interpolate_irradiances(wavelength_array_t *wl_array, const double* irradiance);
 #endif //DWCPNC_IRRADIANCE_H

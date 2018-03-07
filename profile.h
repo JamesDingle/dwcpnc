@@ -92,6 +92,9 @@ typedef struct {
 
 typedef struct {
     double sunrise;
+    double delta_t;
+    double day_length;
+    double delta_prestart;
     int count;
     double *values;
 } time_profile_t;
@@ -111,6 +114,17 @@ gen_chl_prof(
         double step,
         int province,
         double surface_chl
+);
+
+depth_profile_t* gen_chl_prof_no_lookup(
+        double zmin,
+        double zmax,
+        int count,
+        double step,
+        double sigma,
+        double h,
+        double zm,
+        double B0
 );
 
 time_profile_t *
