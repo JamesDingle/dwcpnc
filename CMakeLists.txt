@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.6)
 project(dwcpnc)
 
 set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_FLAGS "-O5 -ffast-math -Wall")
 
 set(SOURCE_FILES main.c dwcpnc.c dwcpnc.h solar.c solar.h profile.c profile.h penguin.c penguin.h irradiance.c irradiance.h)
 add_executable(dwcpnc ${SOURCE_FILES})
