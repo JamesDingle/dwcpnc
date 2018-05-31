@@ -34,7 +34,7 @@ add_library(dwcpnc STATIC ${DWCPNC_SOURCE})
 target_link_libraries(dwcpnc m)
 
 
-add_executable(run_pp src/main.c)
+add_executable(run_pp src/main.c src/args.c src/args.h)
 target_link_libraries(run_pp ezncdf)
 target_link_libraries(run_pp vbn)
 target_link_libraries(run_pp dwcpnc)

@@ -1,13 +1,23 @@
 #include "dwcpn/dwcpnc.h"
+#include "args.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
 
 
-int main() {
+int main(int argc, char **argv) {
 
     float start_time = (float)clock() / CLOCKS_PER_SEC;
+
+    args_t *args;
+    args = parse_args(argc, argv);
+
+    if (!validate_args(args)) {
+        return EXIT_FAILURE;
+    }
+
+
 
     // initialisation of dwcpn parameters here, these will not change throughout the entire
     // execution
