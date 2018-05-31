@@ -109,6 +109,11 @@ double* compute_diffuse_irradiance(wavelength_array_t *wl_array, double zenith_d
     double* zen_lut = (double[7]){0., 37., 48.19, 60., 70., 75., 80.};
 
     int c_idx = find_zenith_array_pos(zenith_d, zen_lut, 7);
+
+    if (zenith_d >= 80.) {
+        c_idx = 6;
+    }
+
     double* c = c_array_lookup(c_idx);
 
     double* cm1 = c_array_lookup(c_idx-1);

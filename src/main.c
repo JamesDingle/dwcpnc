@@ -1,4 +1,4 @@
-#include "dwcpnc.h"
+#include "dwcpn/dwcpnc.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
