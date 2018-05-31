@@ -8,7 +8,10 @@
 
 double compute_airmass(double zenith_r, double zenith_d) {
     double airmass;
-    airmass = pow(cos(zenith_r) + 0.15 * pow(93.885 - zenith_d, -1.253), -1.0);
+//    airmass = pow(cos(zenith_r) + 0.15 * pow(93.885 - zenith_d, -1.253), -1.0);
+
+    airmass = 1.0 / (cos(zenith_r) + 0.15 * (pow(93.885 - zenith_d, -1.253)));
+
     if (airmass < 1.0) {
         airmass = 1.0;
     }
@@ -38,9 +41,9 @@ double* compute_aerosol_transmittance(wavelength_array_t *wl_array, double airma
     for (i = 0; i < wl_array->count; ++i){
         wld = wl_array->values[i] / 1000.0;
         if (i < 10) {
-            ta[i] = exp(-BETA1 * pow(wld, ALPHA1) * airmass);
+            ta[i] = exp(-BETA1 * pow(wld, -ALPHA1) * airmass);
         } else {
-            ta[i] = exp(-BETA2 * pow(wld, ALPHA2) * airmass);
+            ta[i] = exp(-BETA2 * pow(wld, -ALPHA2) * airmass);
         }
     }
 
@@ -73,7 +76,7 @@ double* compute_ozone_transmittance(wavelength_array_t *wl_array, double airmass
 }
 
 double compute_tu(double airmass){
-    return exp(-1.41 * 0.3 * airmass / pow(1 + 118.93 * 0.3 * airmass, 0.45));
+    return exp(-1.41 * 0.15 * airmass / pow(1 + 118.3 * 0.15 * airmass, 0.45));
 }
 
 double* compute_air_albedo(wavelength_array_t *wl_array, double* ta, double* to, double* tr, double tu, double* tw){
@@ -83,7 +86,7 @@ double* compute_air_albedo(wavelength_array_t *wl_array, double* ta, double* to,
     for (i = 0; i < wl_array->count; ++i){
         ro_s[i] = to[i] * tw[i] * (ta[i] * (1.0 - tr[i]) * 0.5 + tr[i] * (1 - ta[i]) * 0.22 * 0.928);
     }
-    ro_s[wl_array->count - 1] = ro_s[wl_array->count - 1] * tu;
+    ro_s[23] = ro_s[23] * tu;
     return ro_s;
 }
 
@@ -95,7 +98,7 @@ double* compute_direct_irradiance(wavelength_array_t *wl_array, double* ta, doub
     for (i = 0; i < wl_array->count; ++i) {
         direct[i] = EXTSPIR[i] * tr[i] * ta[i] * tw[i] * to[i];
     }
-    direct[wl_array->count - 1] = direct[wl_array->count - 1] * tu;
+    direct[23] = direct[23] * tu;
 
     return direct;
 }
@@ -153,7 +156,7 @@ double* compute_diffuse_irradiance(wavelength_array_t *wl_array, double zenith_d
         r = xx * ta[l] * (1.0 - tr[l]) * 0.5;
         a = xx * tr[l] * (1.0 - ta[l]) * 0.928 * 0.82;
 
-        if (l == 23) {
+        if (l == 22) {
             r = r * tu;
             a = a * tu;
         }
@@ -182,21 +185,30 @@ int find_zenith_array_pos(double zenith_d, const double* zen_array, int num) {
 
 double* c_array_lookup(int index) {
 
+    // TESTING JUST IN CASE THIS IS THE WRONG WAY AROUND
+//    double* c_array = (double[35]){
+//            1.11, 1.04, 1.15, 1.12, 1.32,
+//            1.13, 1.05, 1.00, 0.96, 1.12,
+//            1.18, 1.09, 1.00, 0.96, 1.07,
+//            1.24, 1.11, 0.99, 0.94, 1.02,
+//            1.46, 1.24, 1.06, 0.99, 1.10,
+//            1.70, 1.34, 1.07, 0.96, 0.90,
+//            2.61, 1.72, 1.22, 1.04, 0.80
+//    };
+
     double* c_array = (double[35]){
-            1.11, 1.04, 1.15, 1.12, 1.32,
-            1.13, 1.05, 1.00, 0.96, 1.12,
-            1.18, 1.09, 1.00, 0.96, 1.07,
-            1.24, 1.11, 0.99, 0.94, 1.02,
-            1.46, 1.24, 1.06, 0.99, 1.10,
-            1.70, 1.34, 1.07, 0.96, 0.90,
-            2.61, 1.72, 1.22, 1.04, 0.80
+            1.11, 1.13, 1.18, 1.24, 1.46, 1.70, 2.61,
+            1.04, 1.05, 1.09, 1.11, 1.24, 1.34, 1.72,
+            1.15, 1.00, 1.00, 0.99, 1.06, 1.07, 1.22,
+            1.12, 0.96, 0.96, 0.94, 0.99, 0.96, 1.04,
+            1.32, 1.12, 1.07, 1.02, 1.10, 0.90, 0.80
     };
 
     double* ret_array = (double*)malloc(sizeof(double) * 5);
 
     int i;
     for (i = 0; i < 5; ++i) {
-        ret_array[i] = c_array[(index * 5) + i];
+        ret_array[i] = c_array[(i * 7) + index];
     }
 
     return ret_array;

@@ -161,7 +161,7 @@ time_profile_t* gen_time_prof(double sunrise, int count) {
 
     int i;
     for (i = 0; i < count; ++i) {
-        prof->values[i] = sunrise + prof->delta_t * (i+1);
+        prof->values[i] = sunrise + prof->delta_t * (i);
     }
 
     prof->day_length =  2 * (12.0 - sunrise);

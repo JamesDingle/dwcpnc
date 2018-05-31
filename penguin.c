@@ -99,7 +99,7 @@ pp_result_t* compute_pp_along_profile(
         if (z > 0) {
             if (pp_result->par_profile[z] < (0.01 * pp_result->par_profile[0])) {
                 pp_result->euphotic_depth_index = z - 1;
-                pp_result->euphotic_depth = chl_profile->depths[z-1] + chl_profile->step * log(100 * pp_result->par_profile[z-1] / pp_result->par_profile[z]) /\
+                pp_result->euphotic_depth = chl_profile->depths[z-1] + chl_profile->step * log(100 * pp_result->par_profile[z-1] / pp_result->par_profile[0]) /\
                                                            log(pp_result->par_profile[z-1] / pp_result->par_profile[z]);
                 pp_result->success = 1;
 

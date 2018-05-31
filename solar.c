@@ -12,6 +12,7 @@ double compute_sunrise(int jday, double lat) {
     double theta, delta, phi, phidel;
     theta = (2.0 * M_PI * day) / 365.0;
     delta = 0.006918 - 0.399912 * cos(theta) +
+            0.070257 * sin(theta) -
             0.006758 * cos(2.0 * theta) + 0.000907 * sin(2.0 * theta) -
             0.002697 * cos(3.0 * theta) + 0.001480 * sin(3.0 * theta);
 

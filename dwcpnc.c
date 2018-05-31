@@ -79,7 +79,7 @@ float calc_pixel_pp(dwcpn_params_t *dwcpn_params, req_data_t *inp_data) {
 
 
     pp_t = (double*)calloc((size_t)tprof->count, sizeof(double));
-    euph_t = (double*)malloc(sizeof(double) * tprof->count);
+    euph_t = (double*)calloc((size_t)tprof->count, sizeof(double));
 
     // start to loop over each time step now
     for (t = 0; t < tprof->count; ++t){
@@ -249,22 +249,28 @@ float calc_pixel_pp(dwcpn_params_t *dwcpn_params, req_data_t *inp_data) {
     z_phot_day = euph_t[0] * i_zero[0] * tprof->delta_prestart / 2.0;
     i_0_day = i_zero[0] * tprof->delta_prestart / 2.0;
 
+    double max_euphotic_depth = 0;
+
     //integrate over time
     for (t = 0; t < tprof->count - 1; ++t) {
         pp_day = pp_day + (pp_t[t] + pp_t[t+1]) * tprof->delta_t / 2.0;
-        z_phot_day = z_phot_day + (euph_t[t] * i_zero[t] + euph_t[t+1] * i_zero[t+1] * tprof->delta_t / 2.0);
-        i_0_day = i_0_day + (i_zero[t] + i_zero[t+1]) * tprof->delta_t / 2.0;
+//        z_phot_day = z_phot_day + (euph_t[t] * i_zero[t] + euph_t[t+1] * i_zero[t+1] * tprof->delta_t / 2.0);
+//        i_0_day = i_0_day + (i_zero[t] + i_zero[t+1]) * tprof->delta_t / 2.0;
+
+        if (max_euphotic_depth < euph_t[t]) {
+            max_euphotic_depth = euph_t[t];
+        }
     }
 
     // mutliply by two because we have only integrated over half of the day
     pp_day = pp_day * 2.0;
-    z_phot_day = z_phot_day * 2.0;
+//    z_phot_day = z_phot_day * 2.0;
     i_0_day = i_0_day * 2.0;
 
     // normalise photic depth to irradiance
     z_phot_day = z_phot_day / i_0_day;
 
-    printf("PP: %f photic depth: %f\n", pp_day, z_phot_day);
+    printf("PP: %f photic depth: %f\n", pp_day, max_euphotic_depth);
 
     free(pp_t);
     free(euph_t);

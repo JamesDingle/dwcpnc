@@ -23,7 +23,7 @@ static const int NUM_WL = 24;
 
 // water vapour absorption coefficient
 static const double AV[24] = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
-                        0.075, 0., 0., 0., 0., 0.016, 0.05};
+                        0.075, 0., 0., 0., 0., 0.016, 0.0125};
 
 // ozone absorption coefficient
 static const double AO[24] = {0., 0., 0., 0., 0., 0.003, 0.006, 0.009, 0.014, 0.021, 0.030, 0.040,
