@@ -13,27 +13,28 @@
 #include <assert.h>
 
 typedef struct {
-    int scale_factor;
+    int chunk_length;
     char *dim_name;
-} dim_scale_t;
+} chunk_def_t;
 
 typedef struct {
     int count;
-    dim_scale_t *scaled_dims;
-} scale_info_t;
+    chunk_def_t *dim_chunks;
+} chunk_info_t;
 
 typedef struct {
     char *infile;
     int overwrite;
     int debug;
-    scale_info_t *scale_info;
+    int nthreads;
+    chunk_info_t *scale_info;
 } args_t;
 
 // generic/self explanatory functions
 
 args_t *parse_args(int argc, char **argv);
 
-scale_info_t *parse_scale_arg(char *scale_string);
+chunk_info_t *parse_chunk_arg(char *chunk_string);
 
 int validate_args(args_t *args);
 

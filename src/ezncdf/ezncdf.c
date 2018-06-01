@@ -189,6 +189,14 @@ open_ncdf(char *filename, int openmode) {
 
     ncfile_t *ncfile = (ncfile_t *) malloc(sizeof(ncfile_t));
 
+    ncfile->lock = (pthread_mutex_t*)malloc(sizeof(pthread_mutex_t));
+    if (pthread_mutex_init(ncfile->lock, NULL) != 0) {
+        printf("Mutex Initialisation Failed\n");
+        exit(EXIT_FAILURE);
+    }
+    pthread_mutex_lock(ncfile->lock);
+
+
     int retval, ncid;
     if ((retval = nc_open(filename, openmode, &ncid))) {
         ERR(retval);
@@ -278,6 +286,7 @@ open_ncdf(char *filename, int openmode) {
     ncfile->gatts = gatts;
 
     free(group_handles);
+    pthread_mutex_unlock(ncfile->lock);
     return ncfile;
 }
 

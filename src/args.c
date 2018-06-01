@@ -14,20 +14,21 @@ args_t *parse_args(int argc, char **argv) {
     args->debug = 0;
     args->overwrite = 0;
     args->infile = "";
+    args->scale_info = NULL;
 
-    while ((opt = getopt(argc, argv, ":dwi:o:s:")) != -1) {
+    while ((opt = getopt(argc, argv, ":di:c:j:")) != -1) {
         switch (opt) {
             case 'd':
                 args->debug = 1;
                 break;
-            case 'w':
-                args->overwrite = 1;
-                break;
             case 'i':
                 args->infile = (optarg);
                 break;
-            case 's':
-                args->scale_info = parse_scale_arg(optarg);
+            case 'c':
+                args->scale_info = parse_chunk_arg(optarg);
+                break;
+            case 'j':
+                args->nthreads = atoi(optarg);
                 break;
             default:
                 break;
@@ -38,56 +39,56 @@ args_t *parse_args(int argc, char **argv) {
 
 }
 
-scale_info_t *parse_scale_arg(char *scale_string) {
+chunk_info_t *parse_chunk_arg(char *chunk_string) {
 
-    assert(scale_string != NULL);
+    assert(chunk_string != NULL);
 
     int comma_count, delim_count;
 
-    comma_count = how_many_of_char_in_str(",", scale_string);
+    comma_count = how_many_of_char_in_str(",", chunk_string);
 
     // allocate the struct to store these pairings
-    scale_info_t *scale_info;
-    scale_info = (scale_info_t *) malloc(sizeof(scale_info_t));
+    chunk_info_t *chunk_info;
+    chunk_info = (chunk_info_t *) malloc(sizeof(chunk_info_t));
 
     char *token;
 
     // if we have no delimiters, we must only be scaling 1 dimension, else error
     if (comma_count == 0) {
 
-        delim_count = how_many_of_char_in_str("=", scale_string);
+        delim_count = how_many_of_char_in_str("=", chunk_string);
 
         if (delim_count == 1) {
-            dim_scale_t *dim_scale = (dim_scale_t *) malloc(sizeof(dim_scale_t));
-            dim_scale->dim_name = strsep(&scale_string, "=");
-            dim_scale->scale_factor = atoi(strsep(&scale_string, "="));
+            chunk_def_t *dim_scale = (chunk_def_t *) malloc(sizeof(chunk_def_t));
+            dim_scale->dim_name = strsep(&chunk_string, "=");
+            dim_scale->chunk_length = atoi(strsep(&chunk_string, "="));
 
-            scale_info->count = 1;
-            scale_info->scaled_dims = (dim_scale_t *) malloc(sizeof(dim_scale_t));
-            scale_info->scaled_dims = dim_scale;
+            chunk_info->count = 1;
+            chunk_info->dim_chunks = (chunk_def_t *) malloc(sizeof(chunk_def_t));
+            chunk_info->dim_chunks = dim_scale;
         } else {
             return NULL;
         }
 
     } else {
-        scale_info->count = comma_count + 1;
-        scale_info->scaled_dims = (dim_scale_t *) malloc(sizeof(dim_scale_t) * comma_count + 1);
+        chunk_info->count = comma_count + 1;
+        chunk_info->dim_chunks = (chunk_def_t *) malloc(sizeof(chunk_def_t) * comma_count + 1);
 
         int i = 0;
-        while ((token = strsep(&scale_string, ",")) != NULL && (i <= comma_count)) {
+        while ((token = strsep(&chunk_string, ",")) != NULL && (i <= comma_count)) {
             token = strip(token);
             delim_count = how_many_of_char_in_str("=", token);
 
             if (delim_count > 0) {
-                scale_info->scaled_dims[i].dim_name = strip(strsep(&token, "="));
-                scale_info->scaled_dims[i].scale_factor = atoi(strip(strsep(&token, "=")));
+                chunk_info->dim_chunks[i].dim_name = strip(strsep(&token, "="));
+                chunk_info->dim_chunks[i].chunk_length = atoi(strip(strsep(&token, "=")));
                 ++i;
             } else {
                 return NULL;
             }
         }
     }
-    return scale_info;
+    return chunk_info;
 }
 
 int validate_args(args_t *args) {

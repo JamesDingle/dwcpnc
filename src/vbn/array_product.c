@@ -1,56 +1,56 @@
 #include "array_product.h"
 #include "vbn.h"
 
-int main(int argc, char *argv[]) {
-
-    int i, j;
-
-    ca_array_t test;
-    test.ndims = 3;
-
-    test.chunk_arrays = (chunk_array_t**)malloc(sizeof(chunk_array_t*) * test.ndims);
-
-
-    test.chunk_arrays[0] = gen_chunks(10,3);
-    test.chunk_arrays[1] = gen_chunks(10,3);
-    test.chunk_arrays[2] = gen_chunks(10,3);
-//    test.chunk_arrays[3] = gen_chunks(2,1);
-//    test.chunk_arrays[2] = gen_chunks(13,2);
-
-
-    variable_base_num *vbn;
-
-    vbn = init_vbn(test.ndims);
-
-    for (i = 0; i < test.ndims; ++i) {
-        vbn->digit_max[i] = test.chunk_arrays[i]->count - 1;
-    }
-
-    int indices[4] = {9999,1,1,1};
-    int extents[4] = {10000,1000,100,10};
-    int index = nd_to_1d(indices, extents, 4);
-    printf("1d index: %d\n", index);
-
-    i = 0;
-    do {
-        printf("%03d: ", i);
-        for (j = 0; j < vbn->digit_count; ++j) {
-            print_chunk(*test.chunk_arrays[j]->chunks[vbn->digit_value[j]]);
-            printf(", ");
-//            print_vbn(vbn);
-        }
-
-        printf("\n");
-        ++i;
-    } while(increment_vbn(vbn));
-////
-////    free(ca1);
-////    free(ca2);
-////    free(ca3);
-
-    return 0;
-
-}
+//int main(int argc, char *argv[]) {
+//
+//    int i, j;
+//
+//    ca_array_t test;
+//    test.ndims = 3;
+//
+//    test.chunk_arrays = (chunk_array_t**)malloc(sizeof(chunk_array_t*) * test.ndims);
+//
+//
+//    test.chunk_arrays[0] = gen_chunks(10,3);
+//    test.chunk_arrays[1] = gen_chunks(10,3);
+//    test.chunk_arrays[2] = gen_chunks(10,3);
+////    test.chunk_arrays[3] = gen_chunks(2,1);
+////    test.chunk_arrays[2] = gen_chunks(13,2);
+//
+//
+//    variable_base_num *vbn;
+//
+//    vbn = init_vbn(test.ndims);
+//
+//    for (i = 0; i < test.ndims; ++i) {
+//        vbn->digit_max[i] = test.chunk_arrays[i]->count - 1;
+//    }
+//
+//    int indices[4] = {9999,1,1,1};
+//    int extents[4] = {10000,1000,100,10};
+//    int index = nd_to_1d(indices, extents, 4);
+//    printf("1d index: %d\n", index);
+//
+//    i = 0;
+//    do {
+//        printf("%03d: ", i);
+//        for (j = 0; j < vbn->digit_count; ++j) {
+//            print_chunk(*test.chunk_arrays[j]->chunks[vbn->digit_value[j]]);
+//            printf(", ");
+////            print_vbn(vbn);
+//        }
+//
+//        printf("\n");
+//        ++i;
+//    } while(increment_vbn(vbn));
+//////
+//////    free(ca1);
+//////    free(ca2);
+//////    free(ca3);
+//
+//    return 0;
+//
+//}
 
 chunk_array_t *
 gen_chunks(int total_length, int chunk_length) {
@@ -110,41 +110,18 @@ int nd_to_1d(int* indices, int* extents, int count) {
     int i,j;
     int tmp = 0;
 
-    printf("For array of size: ");
     for (i = 0; i < count; ++i) {
-        printf("[%d]",extents[i]);
-    }
-    printf(":\n\tindex ");
-
-    for (i = 0; i < count; ++i) {
-        printf("[%d]",indices[i]);
-    }
-    printf(" = ");
-
-    for (i = 0; i < count; ++i) {
-
         tmp = indices[i];
 
-
         if (count - i > 0) {
-            printf("(%d", tmp);
             for (j = i+1; j < count; ++j) {
-//                printf("%d: %d \n",j,vbn->digit_max[j]);
-                printf(" * %d", extents[j]);
                 tmp *= extents[j];
             }
-            printf(")");
             index += tmp;
         } else {
-            printf(" + %d", tmp);
             index += tmp;
         }
-        if (i < count - 1 ) {
-            printf(" + ");
-        }
     }
-
-    printf("\n");
 
     return index;
 }

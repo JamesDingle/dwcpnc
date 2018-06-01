@@ -10,6 +10,9 @@
 #include <inttypes.h>
 #include "geo_math.h"
 
+#include <pthread.h>
+
+
 #define ERRCODE 2
 #define ERR(e) {printf("Error: %s %s %d\n", nc_strerror(e), __FILE__, __LINE__); exit(ERRCODE);}
 
@@ -82,6 +85,7 @@ typedef struct {
     ncatt_t *gatts;
     int nunlimdims;
     int ncformat;
+    pthread_mutex_t *lock;
 } ncfile_t;
 
 const char *prim_type_name(nc_type type);

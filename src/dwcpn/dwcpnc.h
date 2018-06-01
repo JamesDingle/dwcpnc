@@ -41,4 +41,6 @@ float calc_pixel_pp(
         req_data_t *inp_data
 );
 
+void print_req_data(req_data_t *data);
+
 #endif //DWCPNC_DWCPNC_H
