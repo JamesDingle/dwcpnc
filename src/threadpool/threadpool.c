@@ -47,6 +47,7 @@ thread_pool_t *init_thread_pool(uint16_t nthreads_, work_queue_t *work_queue) {
         return NULL;
     }
 
+    thread_pool->status = pool_ready;
 
     //printf("creating pthread instances\n");
     worker_args_t *worker_args;
@@ -86,7 +87,8 @@ void free_thread_pool(thread_pool_t *thread_pool) {
             threadptr = &thread_pool->threads[i];
             if (threadptr != NULL) {
                 pthread_join(*threadptr, NULL);
-                free(threadptr);
+//                free(threadptr);
+                printf("Joined thread: %d\n", i);
             }
         }
 
@@ -99,7 +101,7 @@ void *worker_thread(void *worker_args) {
     worker_args_t *args = (worker_args_t*)worker_args;
     task_t *task;
 
-    //printf("[thread %d] started\n", args->worker_id);
+    printf("[thread %d] started\n", args->worker_id);
 
     while(1) {
 
@@ -128,7 +130,6 @@ void *worker_thread(void *worker_args) {
 
         } else if (args->parent_pool->status == pool_stopping) {
             printf("[thread %d] noticed pool is over\n", args->worker_id);
-            exit(EXIT_SUCCESS);
             break;
         } else {
             usleep(1);
@@ -148,6 +149,12 @@ void *worker_thread(void *worker_args) {
 //            printf("[thread %d] task finished!\n", args->worker_id);
             free(task);
         }
+
+        if (args->parent_pool->status == pool_stopping) {
+            return NULL;
+        }
+
+
     } // end loop
 
     printf("[thread %d] thread stopping!\n", args->worker_id);

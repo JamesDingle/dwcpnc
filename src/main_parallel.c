@@ -4,6 +4,7 @@
 
 #include "main_parallel.h"
 #include "args.h"
+#include "threadpool/threadpool.h"
 
 int main(int argc, char **argv) {
 
@@ -63,6 +64,7 @@ int main(int argc, char **argv) {
 
     size_t x, y;
     for (x = 0; x < lon->size; ++x) {
+//    for (x = 0; x < 1; ++x) {
         printf("%d/241\n", x);
         for (y = 0; y < lat->size; ++y) {
 
@@ -142,9 +144,10 @@ int main(int argc, char **argv) {
     usleep(1000); // wait one second for threads to catch up!
 
     free_thread_pool(pool);
-    free_queue(queue);
 
-    //free(data_var_indexes);
+
+    free_queue(queue);
+    free_ncfile(ncfile);
     free(args);
     return 0;
 
