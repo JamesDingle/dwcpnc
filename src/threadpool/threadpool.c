@@ -127,11 +127,12 @@ void *worker_thread(void *worker_args) {
             }
 
         } else if (args->parent_pool->status == pool_stopping) {
-            //printf("[thread %d] noticed pool is over\n", args->worker_id);
+            printf("[thread %d] noticed pool is over\n", args->worker_id);
+            exit(EXIT_SUCCESS);
             break;
         } else {
             usleep(1);
-            //printf("[thread %d] waiting for pool to run or stop\n", args->worker_id);
+            printf("[thread %d] waiting for pool to run or stop\n", args->worker_id);
             task = NULL;
         }
 
@@ -140,19 +141,19 @@ void *worker_thread(void *worker_args) {
 
         // do work!
         if (task != NULL) {
-            printf("[thread %d] task started!\n", args->worker_id);
+//            printf("[thread %d] task started!\n", args->worker_id);
 
             (task->function_ptr)(task->function_args);
 
-            printf("[thread %d] task finished!\n", args->worker_id);
+//            printf("[thread %d] task finished!\n", args->worker_id);
             free(task);
         }
     } // end loop
 
-    //printf("[thread %d] thread stopping!\n", args->worker_id);
+    printf("[thread %d] thread stopping!\n", args->worker_id);
 
-    //free(args);
-    //args = NULL; // kill the dangling pointer
+//    free(args);
+//    args = NULL; // kill the dangling pointer
     return NULL;
 }
 
@@ -176,7 +177,6 @@ int add_task(work_queue_t *queue, task_t *task) {
     }
 
     pthread_mutex_unlock(queue->lock);
-    printf("Finished adding task...\n");
     return 0;
 
 }

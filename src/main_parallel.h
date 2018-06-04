@@ -21,6 +21,6 @@ typedef struct {
 } f_args_t;
 
 int main(int argc, char * argv[]);
-void f(int thread, void *params);
+void f(void *params);
 
 #endif //DWCPNC_MAIN_PARALLEL_H

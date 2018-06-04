@@ -20,12 +20,12 @@ int main(int argc, char **argv) {
     printf("creating queue\n");
     work_queue_t *queue;
     printf("initialising queue\n");
-    queue = init_queue(20); //initialise work queue with max length of 20
+    queue = init_queue(100); //initialise work queue with max length of 20
 
     printf("creating pool\n");
     thread_pool_t *pool;
     printf("initialising pool\n");
-    pool = init_thread_pool(args->nthreads, queue);
+    pool = init_thread_pool((uint16_t )args->nthreads, queue);
 
     // initialisation of dwcpn parameters here, these will not change throughout the entire
     // execution
@@ -63,7 +63,7 @@ int main(int argc, char **argv) {
 
     size_t x, y;
     for (x = 0; x < lon->size; ++x) {
-//        printf("%d/241\n", x);
+        printf("%d/241\n", x);
         for (y = 0; y < lat->size; ++y) {
 
             tpos = (req_data_t *) malloc(sizeof(req_data_t));
@@ -130,24 +130,27 @@ int main(int argc, char **argv) {
             }
         }
 
-        while (queue->item_count > 0) {
-            usleep(10000);
-        }
-
-        pool->status = pool_stopping;
-
-        free_thread_pool(pool);
-        free_queue(queue);
-
-        //free(data_var_indexes);
-        free(args);
-        return 0;
-
     }
+
+    while (queue->item_count > 0) {
+//        usleep(10);
+        asm ("nop");
+    }
+
+    pool->status = pool_stopping;
+
+    usleep(1000); // wait one second for threads to catch up!
+
+    free_thread_pool(pool);
+    free_queue(queue);
+
+    //free(data_var_indexes);
+    free(args);
+    return 0;
 
 }
 
-void f(int thread, void *params) {
+void f(void *params) {
 
     f_args_t f_args;
     f_args = *(f_args_t *)params;
@@ -158,7 +161,8 @@ void f(int thread, void *params) {
 
     // write chunk row to output file
     pthread_mutex_lock(f_args.inputfile->lock);
-    nc_put_vara_float(f_args.inputfile->file_handle, file_has_var(f_args.inputfile, "pp"), f_args.ind, f_args.count, &result);
+
+    //nc_put_vara_float(f_args.inputfile->file_handle, file_has_var(f_args.inputfile, "pp"), f_args.ind, f_args.count, &result);
 
     nc_sync(f_args.inputfile->file_handle);
     pthread_mutex_unlock(f_args.inputfile->lock);
