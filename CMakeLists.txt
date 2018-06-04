@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.6)
 project(dwcpnc)
 
 set(CMAKE_C_STANDARD 99)
-#set(CMAKE_C_FLAGS "-O5 -ffast-math -Wall")
-set(CMAKE_C_FLAGS "-ffast-math -Wall")
+set(CMAKE_C_FLAGS "-O5 -ffast-math -Wall")
+#set(CMAKE_C_FLAGS "-ffast-math -Wall")
 
 set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/bin)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
@@ -45,7 +45,7 @@ set(RUN_PP_SOURCE
 
 add_executable(run_pp ${EZNCDF_SOURCE} ${VBN_SOURCE} ${DWCPNC_SOURCE} ${RUN_PP_SOURCE})
 target_link_libraries(run_pp netcdf)
-target_link_libraries(run_pp mvec m)
+target_link_libraries(run_pp m)
 #target_link_libraries(run_pp ${LIBRARY_OUTPUT_PATH}/libvbn.a)
 #target_link_libraries(run_pp ${LIBRARY_OUTPUT_PATH}/libezncdf.a)
 #target_link_libraries(run_pp ${LIBRARY_OUTPUT_PATH}/libdwcpnc.a)

@@ -117,9 +117,9 @@ int main(int argc, char **argv) {
             tpos->sat_par = (double)*(float *)val;
 
 //            print_req_data(tpos);
-//            result = calc_pixel_pp(dwcpn_params, tpos);
+            result = calc_pixel_pp(dwcpn_params, tpos);
 //            printf("%f\n", result);
-//            nc_put_vara_float(ncfile->file_handle, file_has_var(ncfile, "pp"), ind, count, &result);
+            nc_put_vara_float(ncfile->file_handle, file_has_var(ncfile, "pp"), ind, count, &result);
 //
         }
 //        nc_sync(ncfile->file_handle);

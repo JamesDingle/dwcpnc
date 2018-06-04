@@ -18,20 +18,20 @@ typedef struct {
 } dwcpn_params_t;
 
 typedef struct {
-    double lat;
-    double lon;
+    float lat;
+    float lon;
     int julday;
-    double bathymetry;
-    double alpha_b;
-    double pm_b;
-    double zm;
-    double b0;
-    double h;
-    double sigma;
-    double rho;
-    double cloud;
-    double yel_sub;
-    double sat_par;
+    float bathymetry;
+    float alpha_b;
+    float pm_b;
+    float zm;
+    float b0;
+    float h;
+    float sigma;
+    float rho;
+    float cloud;
+    float yel_sub;
+    float sat_par;
 } req_data_t;
 
 int dwcpn(double zmin, double zmax, int nmx);

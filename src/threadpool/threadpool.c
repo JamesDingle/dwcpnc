@@ -103,6 +103,8 @@ void *worker_thread(void *worker_args) {
 
     printf("[thread %d] started\n", args->worker_id);
 
+
+
     while(1) {
 
         // acquire lock
@@ -124,6 +126,7 @@ void *worker_thread(void *worker_args) {
                 --args->work_queue->item_count;
                 ++args->work_queue->space_left;
             } else {
+                printf("[thread %d] waiting for more jobs in pool\n", args->worker_id);
                 //usleep(1);
                 task = NULL;
             }
@@ -142,11 +145,12 @@ void *worker_thread(void *worker_args) {
 
         // do work!
         if (task != NULL) {
+            float start_time = (float) clock() / CLOCKS_PER_SEC;
 //            printf("[thread %d] task started!\n", args->worker_id);
 
             (task->function_ptr)(task->function_args);
-
-//            printf("[thread %d] task finished!\n", args->worker_id);
+            float stop_time = (float) clock() / CLOCKS_PER_SEC;
+//            printf("[thread %d] task finished in %f seconds!\n", args->worker_id, (stop_time-start_time));
             free(task);
         }
 
