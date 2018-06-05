@@ -231,7 +231,8 @@ void f(void *params) {
 
     result = calc_pixel_pp(f_args.dwcpn_params, f_args.req_data);
 
-    if ((!isinf(result)) || (result > 1000000)) {
+    if (!(isinf(result)) || (result <= 1000000)) {
+
 
         // write chunk row to output file
         pthread_mutex_lock(f_args.inputfile->lock);

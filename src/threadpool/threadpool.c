@@ -126,7 +126,7 @@ void *worker_thread(void *worker_args) {
                 --args->work_queue->item_count;
                 ++args->work_queue->space_left;
             } else {
-                printf("[thread %d] waiting for more jobs in pool\n", args->worker_id);
+//                printf("[thread %d] waiting for more jobs in pool\n", args->worker_id);
                 //usleep(1);
                 task = NULL;
             }
