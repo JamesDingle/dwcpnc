@@ -270,7 +270,7 @@ float calc_pixel_pp(dwcpn_params_t *dwcpn_params, req_data_t *inp_data) {
     // normalise photic depth to irradiance
     z_phot_day = z_phot_day / i_0_day;
 
-    printf("PP: %f photic depth: %f\n", pp_day, max_euphotic_depth);
+//    printf("PP: %f photic depth: %f\n", pp_day, max_euphotic_depth);
 
     free(pp_t);
     free(euph_t);
@@ -296,12 +296,14 @@ float calc_pixel_pp(dwcpn_params_t *dwcpn_params, req_data_t *inp_data) {
     free(bbr);
     free(ay);
 
-
+    return (float)pp_day;
 
 
 }
 
-
+void print_req_data(req_data_t *data) {
+    printf("Position: [%f,%f]\n",data->lat, data->lon);
+}
 
 
 

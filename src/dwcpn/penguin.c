@@ -92,9 +92,9 @@ pp_result_t* compute_pp_along_profile(
 
         pp_result->pp_profile[z] = (alpha_b / sqrt(1.0 + pow(alpha_b / pi_pmb, 2))) * chl;
 
-        if (isnan(pp_result->pp_profile[z])) {
-            printf("break here\n");
-        }
+//        if (isnan(pp_result->pp_profile[z])) {
+//            printf("break here\n");
+//        }
 
         if (z > 0) {
             if (pp_result->par_profile[z] < (0.01 * pp_result->par_profile[0])) {
