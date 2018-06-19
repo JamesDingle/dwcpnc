@@ -34,6 +34,23 @@ typedef struct {
     float sat_par;
 } req_data_t;
 
+typedef struct {
+    float* lat;
+    float* lon;
+    int julday;
+    float* bathymetry;
+    float* alpha_b;
+    float* pm_b;
+    float* zm;
+    float* b0;
+    float* h;
+    float* sigma;
+    float* rho;
+    float* cloud;
+    float* yel_sub;
+    float* sat_par;
+} req_data_chunk_t;
+
 int dwcpn(double zmin, double zmax, int nmx);
 
 float calc_pixel_pp(

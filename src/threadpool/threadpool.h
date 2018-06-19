@@ -10,8 +10,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <time.h>
 #include <unistd.h>
-
 
 typedef enum {
     pool_ready    = 0,
@@ -39,6 +39,7 @@ typedef struct {
     uint16_t nthreads;
     pthread_t *threads;
     pool_status_t status;
+    pthread_mutex_t *lock;
 } thread_pool_t;
 
 typedef struct {

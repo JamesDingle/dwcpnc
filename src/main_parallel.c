@@ -7,10 +7,11 @@
 #include "threadpool/threadpool.h"
 #include "ezncdf/ezncdf.h"
 #include "dwcpn/dwcpnc.h"
+#include <sys/sysinfo.h>
 
 int main(int argc, char **argv) {
 
-    float start_time = (float) clock() / CLOCKS_PER_SEC;
+
 
     args_t *args;
     args = parse_args(argc, argv);
@@ -20,15 +21,27 @@ int main(int argc, char **argv) {
     }
 
 
+
     printf("creating queue\n");
     work_queue_t *queue;
     printf("initialising queue\n");
-    queue = init_queue((uint16_t)(64)); //initialise work queue with max length of 20
+    queue = init_queue((uint16_t)(1024)); //initialise work queue with max length of 20
+
 
     printf("creating pool\n");
     thread_pool_t *pool;
-    printf("initialising pool\n");
-    pool = init_thread_pool((uint16_t )args->nthreads, queue);
+    if (args->nthreads == 0) {
+        printf("Automatic thread count choice....");
+        printf("\tThis system has %d procs configured and %d procss available\n",get_nprocs_conf(), get_nprocs());
+        printf("\tSetting threadpool to use %d cores\n", get_nprocs() / 2);
+        printf("initialising pool\n");
+        pool = init_thread_pool((uint16_t )(get_nprocs() / 2), queue);
+    } else {
+        printf("initialising pool\n");
+        pool = init_thread_pool((uint16_t )args->nthreads, queue);
+    }
+
+
 
     // initialisation of dwcpn parameters here, these will not change throughout the entire
     // execution
@@ -77,6 +90,7 @@ int main(int argc, char **argv) {
     size_t x, y;
     for (x = 0; x < lon->size; ++x) {
 //    for (x = 0; x < 50; ++x) {
+        float start_time = (float) clock() / CLOCKS_PER_SEC;
         printf("%d/%d\n", (int)x, (int)lon->size);
         for (y = 0; y < lat->size; ++y) {
 
@@ -179,9 +193,9 @@ int main(int argc, char **argv) {
             if (tpos->sat_par == *(float*)par.fill_info->value) {
                 pthread_mutex_unlock(ncfile->lock);
                 continue;
+            } else {
+                pthread_mutex_unlock(ncfile->lock);
             }
-
-            pthread_mutex_unlock(ncfile->lock);
 
 
             f_args = (f_args_t *) malloc(sizeof(f_args_t));
@@ -199,23 +213,61 @@ int main(int argc, char **argv) {
                 res = add_task(queue, task);
 //                usleep(1000);
             }
+
         }
+        float stop_time = (float) clock() / CLOCKS_PER_SEC;
+        printf("Row time: %f\n", (stop_time-start_time));
+        pthread_mutex_lock(ncfile->lock);
+        nc_sync(ncfile->file_handle);
+        pthread_mutex_unlock(ncfile->lock);
 
     }
 
-    while (queue->item_count > 0) {
-//        usleep(10);
-        asm ("nop");
+//    printf("Submission loop finished, waiting until jobs finish to kill queue\n");
+
+    int ic;
+    pthread_mutex_lock(queue->lock);
+    ic = queue->item_count;
+    pthread_mutex_unlock(queue->lock);
+    while (ic > 0) {
+
+//        printf("Jobs remaining in queue: %d\n", queue->item_count);
+        usleep(1000);
+        pthread_mutex_lock(queue->lock);
+        ic = queue->item_count;
+        pthread_mutex_unlock(queue->lock);
+//        asm ("nop");
     }
 
+//    printf("Item count hit zero, doing one final sync...");
+
+    pthread_mutex_lock(ncfile->lock);
+//    printf("lock obtained......");
+    nc_sync(ncfile->file_handle);
+//    printf("ncfil synced......");
+    pthread_mutex_unlock(ncfile->lock);
+//    printf("mutex released......\n");
     pool->status = pool_stopping;
 
-    usleep(1000); // wait one second for threads to catch up!
+//    usleep(1000); // wait one second for threads to catch up!
 
+//    printf("Freeing pool.....");
     free_thread_pool(pool);
+//    printf("freed\n");
 
-
+//    printf("Freeing queue.....\n");
     free_queue(queue);
+//    printf("freed\n");
+
+//    printf("Going for one last sync...");
+    pthread_mutex_lock(ncfile->lock);
+//    printf("lock acquired...");
+    ncsync(ncfile->file_handle);
+//    printf("sync complete...");
+    pthread_mutex_unlock(ncfile->lock);
+//    printf("lock released\n");
+
+
     free_ncfile(ncfile);
     free(args);
     return 0;
@@ -231,7 +283,7 @@ void f(void *params) {
 
     result = calc_pixel_pp(f_args.dwcpn_params, f_args.req_data);
 
-    if (!(isinf(result)) || (result <= 1000000)) {
+    if (!(isinf(result)) || (result <= 1000000.0) || result > 0.0) {
 
 
         // write chunk row to output file
@@ -239,7 +291,7 @@ void f(void *params) {
 
         nc_put_vara_float(f_args.inputfile->file_handle, file_has_var(f_args.inputfile, "pp"), f_args.ind, f_args.count, &result);
 
-        nc_sync(f_args.inputfile->file_handle);
+//        nc_sync(f_args.inputfile->file_handle);
         pthread_mutex_unlock(f_args.inputfile->lock);
     }
 
