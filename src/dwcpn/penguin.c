@@ -5,6 +5,12 @@
 #include "penguin.h"
 #include "profile.h"
 
+const double cm_pn = 0.775;
+const double s_pn = 0.893 / 0.775;
+
+const double cm_p = 0.147;
+const double s_p = 0.751 / 0.147;
+
 pp_result_t* compute_pp_along_profile(
         depth_profile_t *chl_profile,
         wavelength_array_t *wl_array,
@@ -27,6 +33,13 @@ pp_result_t* compute_pp_along_profile(
     double* mu_d = (double*)malloc(sizeof(double) * wl_array->count);
     double* i_z = (double*)malloc(sizeof(double) * wl_array->count);
     double* k = (double*)malloc(sizeof(double) * wl_array->count);
+
+
+    // chlorophyll absorption calculations using Brewin et al three component model
+    double* fract_pico = (double*)malloc(sizeof(double) * wl_array->count);
+    double* fract_nano = (double*)malloc(sizeof(double) * wl_array->count);
+    double* fract_micro = (double*)malloc(sizeof(double) * wl_array->count);
+
     double* ac = (double*)malloc(sizeof(double) * wl_array->count);
 
     double zenith_w = asin(sin(zenith_r) / 1.333);
@@ -47,9 +60,17 @@ pp_result_t* compute_pp_along_profile(
         pp_result->par_profile[z] = 0.0;
         chl = chl_profile->values[z];
 
+        // JAD, update this to use the three component model
         almean = 0.0;
         for (l = 0; l < wl_array->count; ++l) {
             ac[l] =PC1[l] * (1.0 - exp(-RATE[l] * chl)) + PC2[l] * chl;
+
+            fract_pico[l] = PICO[l] * (1.0 - exp(-s_p * chl));
+            fract_nano[l] = cm_pn * (1.0 - exp( -s_pn * chl)) - fract_pico[l];
+            fract_micro[l] = chl - (cm_pn * (1.0 - exp( -s_pn * chl)));
+
+            ac[l]=((PICO[l] * fract_pico[l]) + (NANO[l] * fract_nano[l]) + (MICRO[l] * fract_micro[l]));
+
             almean = almean + ac[l];
         }
         almean = almean / wl_array->count;
@@ -115,6 +136,9 @@ pp_result_t* compute_pp_along_profile(
     free(mu_d);
     free(i_z);
     free(k);
+    free(fract_pico);
+    free(fract_nano);
+    free(fract_micro);
     free(ac);
     return pp_result;
 }
