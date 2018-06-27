@@ -4,10 +4,10 @@
 
 #include "vbn.h"
 
-variable_base_num *init_vbn(int digit_count) {
-    variable_base_num *vbn;
+vbn_t *init_vbn(int digit_count) {
+    vbn_t *vbn;
 
-    vbn = (variable_base_num*)malloc(sizeof(variable_base_num));
+    vbn = (vbn_t*)malloc(sizeof(vbn_t));
     vbn->digit_count = digit_count;
     vbn->digit_max = (int*)calloc((size_t)digit_count, sizeof(int));
     vbn->digit_value = (int*)calloc((size_t)digit_count, sizeof(int));
@@ -15,7 +15,7 @@ variable_base_num *init_vbn(int digit_count) {
     return vbn;
 }
 
-int increment_vbn(variable_base_num *vbn) {
+int increment_vbn(vbn_t *vbn) {
     int i,j;
 
     for (i = vbn->digit_count; i > 0; --i) {
@@ -33,7 +33,7 @@ int increment_vbn(variable_base_num *vbn) {
     return 0; // vbn is already at its max value
 }
 
-void print_vbn(variable_base_num *vbn) {
+void print_vbn(vbn_t *vbn) {
     int i;
 
     for (i = 0; i < vbn->digit_count; ++i) {
@@ -44,7 +44,7 @@ void print_vbn(variable_base_num *vbn) {
 }
 
 
-int vbn_to_base10(variable_base_num *vbn) {
+int vbn_to_base10(vbn_t *vbn) {
     int total = 0;
 
     int i;
@@ -55,7 +55,7 @@ int vbn_to_base10(variable_base_num *vbn) {
     return total;
 }
 
-//int vbn_to_1d_index(variable_base_num *vbn, ca_array_t ca_array) {
+//int vbn_to_1d_index(vbn_t *vbn, ca_array_t ca_array) {
 //    int index = 0;
 //    int d2r = 0; // digits left to the right
 //

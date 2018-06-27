@@ -18,7 +18,7 @@
 ////    test.chunk_arrays[2] = gen_chunks(13,2);
 //
 //
-//    variable_base_num *vbn;
+//    vbn_t *vbn;
 //
 //    vbn = init_vbn(test.ndims);
 //

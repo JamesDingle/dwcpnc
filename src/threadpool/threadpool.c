@@ -212,6 +212,8 @@ void *worker_thread(void *worker_args) {
 int add_task(work_queue_t *queue, task_t *task) {
     pthread_mutex_lock(queue->lock);
 
+    int i;
+
     if (queue->space_left > 0) {
         queue->items[queue->head] = task;
         ++queue->item_count;
@@ -225,6 +227,7 @@ int add_task(work_queue_t *queue, task_t *task) {
 
     } else {
         pthread_mutex_unlock(queue->lock);
+        usleep(10 * 1000); // sleep for 10ms between attempts to add jobs just to avoid maxing out a core just in this add task loop
         return 1;
     }
 

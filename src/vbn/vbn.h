@@ -13,15 +13,15 @@ typedef struct {
     int digit_count;
     int *digit_max;
     int *digit_value;
-} variable_base_num;
+} vbn_t;
 
-variable_base_num * init_vbn(int digit_count);
+vbn_t * init_vbn(int digit_count);
 
-int increment_vbn(variable_base_num *vbn);
+int increment_vbn(vbn_t *vbn);
 
-void print_vbn(variable_base_num *vbn);
+void print_vbn(vbn_t *vbn);
 
-int vbn_to_base10(variable_base_num *vbn);
+int vbn_to_base10(vbn_t *vbn);
 
 
 #endif //C_NC_TOOLS_VBN_H

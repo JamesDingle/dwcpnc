@@ -77,44 +77,44 @@ int main(int argc, char **argv) {
 
             ind1[0] = y;
             nc_get_vara(ncfile->file_handle, file_has_var(ncfile, "lat"), ind1, siz1, val);
-            tpos->lat = (double)*(float *)val;
+            tpos->lat = *(float *)val;
 
             ind1[0] = x;
             nc_get_vara(ncfile->file_handle, file_has_var(ncfile, "lon"), ind1, siz1, val);
-            tpos->lon = (double)*(float *)val;
+            tpos->lon = *(float *)val;
 
             tpos->julday = 15;
 
             nc_get_vara(ncfile->file_handle, file_has_var(ncfile, "bathymetry"), ind, count, val);
-            tpos->bathymetry = (double)*(float *)val;
+            tpos->bathymetry = *(float *)val;
 
             nc_get_vara(ncfile->file_handle, file_has_var(ncfile, "PI_alpha"), ind, count, val);
-            tpos->alpha_b = (double)*(float *)val;
+            tpos->alpha_b = *(float *)val;
 
             nc_get_vara(ncfile->file_handle, file_has_var(ncfile, "PI_pmb"), ind, count, val);
-            tpos->pm_b = (double)*(float *)val;
+            tpos->pm_b = *(float *)val;
 
             nc_get_vara(ncfile->file_handle, file_has_var(ncfile, "zm"), ind, count, val);
-            tpos->zm = (double)*(float *)val;
+            tpos->zm = *(float *)val;
 
             nc_get_vara(ncfile->file_handle, file_has_var(ncfile, "chlor_a"), ind, count, val);
-            tpos->b0 = (double)*(float *)val;
+            tpos->b0 = *(float *)val;
 
             nc_get_vara(ncfile->file_handle, file_has_var(ncfile, "rho"), ind, count, val);
-            tpos->rho = (double)*(float *)val;
+            tpos->rho = *(float *)val;
 
             nc_get_vara(ncfile->file_handle, file_has_var(ncfile, "h"), ind, count, val);
-            tpos->h = (double)*(float *)val;
+            tpos->h = *(float *)val;
 
             nc_get_vara(ncfile->file_handle, file_has_var(ncfile, "sigma"), ind, count, val);
-            tpos->sigma = (double)*(float *)val;
+            tpos->sigma = *(float *)val;
 
 
             tpos->cloud = 0.0;
             tpos->yel_sub = 0.3;
 
             nc_get_vara(ncfile->file_handle, file_has_var(ncfile, "par"), ind, count, val);
-            tpos->sat_par = (double)*(float *)val;
+            tpos->sat_par = *(float *)val;
 
 //            print_req_data(tpos);
             result = calc_pixel_pp(dwcpn_params, tpos);
