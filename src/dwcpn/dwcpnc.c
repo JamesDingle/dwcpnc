@@ -216,14 +216,14 @@ float calc_pixel_pp(dwcpn_params_t *dwcpn_params, req_data_t *inp_data) {
                 pp_result->euphotic_depth_index = 1;
             }
 
-//            double pp_test = pp_result->pp_profile[pp_result->euphotic_depth_index] * (euph_t[t] - (pp_result->euphotic_depth_index - 1) * cprof->step);
-//            if (!isnan(pp_test)) {
-//                pp_t[t] = pp_t[t] + pp_test;
-//            } else {
-//                pp_t[t] = 0;
-//                printf("Nan found\n");
-//            }
-            pp_t[t] = pp_t[t] + pp_result->pp_profile[pp_result->euphotic_depth_index] * (euph_t[t] - (pp_result->euphotic_depth_index - 1) * cprof->step);
+            double pp_test = pp_result->pp_profile[pp_result->euphotic_depth_index] * (euph_t[t] - (pp_result->euphotic_depth_index - 1) * cprof->step);
+            if (!isnan(pp_test)) {
+                pp_t[t] = pp_t[t] + pp_test;
+            } else {
+                pp_t[t] = 0;
+                printf("Nan found\n");
+            }
+//            pp_t[t] = pp_t[t] + pp_result->pp_profile[pp_result->euphotic_depth_index] * (euph_t[t] - (pp_result->euphotic_depth_index - 1) * cprof->step);
         }
 
 
