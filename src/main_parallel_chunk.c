@@ -117,12 +117,11 @@ int main(int argc, char **argv) {
 ////            printf(", ");
 //        }
         print_vbn(vbn);
-
+        print_ca_array_from_vbn(test, vbn);
 //        printf("\n");
         ++i;
     } while(increment_vbn(vbn));
 
-//    printf("Submission loop finished, waiting until jobs finish to kill queue\n");
 
     int ic;
     pthread_mutex_lock(queue->lock);
@@ -130,42 +129,23 @@ int main(int argc, char **argv) {
     pthread_mutex_unlock(queue->lock);
     while (ic > 0) {
 
-//        printf("Jobs remaining in queue: %d\n", queue->item_count);
         usleep(1000);
         pthread_mutex_lock(queue->lock);
         ic = queue->item_count;
         pthread_mutex_unlock(queue->lock);
-//        asm ("nop");
     }
 
-//    printf("Item count hit zero, doing one final sync...");
-
     pthread_mutex_lock(ncfile->lock);
-//    printf("lock obtained......");
     nc_sync(ncfile->file_handle);
-//    printf("ncfil synced......");
     pthread_mutex_unlock(ncfile->lock);
-//    printf("mutex released......\n");
     pool->status = pool_stopping;
 
-//    usleep(1000); // wait one second for threads to catch up!
-
-//    printf("Freeing pool.....");
     free_thread_pool(pool);
-//    printf("freed\n");
-
-//    printf("Freeing queue.....\n");
     free_queue(queue);
-//    printf("freed\n");
 
-//    printf("Going for one last sync...");
     pthread_mutex_lock(ncfile->lock);
-//    printf("lock acquired...");
     ncsync(ncfile->file_handle);
-//    printf("sync complete...");
     pthread_mutex_unlock(ncfile->lock);
-//    printf("lock released\n");
-
 
     free_ncfile(ncfile);
     free(args);

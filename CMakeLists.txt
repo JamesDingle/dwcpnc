@@ -58,10 +58,10 @@ add_executable(run_pp_parallel ${EZNCDF_SOURCE} ${VBN_SOURCE} ${DWCPNC_SOURCE} $
 
 target_link_libraries(run_pp_parallel netcdf m pthread)
 
-set(RUN_PP_PARALLEL_CHUNK_SOURCE
-        src/main_parallel_chunk.c
-        src/args.c
-        )
-add_executable(run_pp_parallel_chunk ${EZNCDF_SOURCE} ${VBN_SOURCE} ${DWCPNC_SOURCE} ${THREADPOOL_SOURCE} ${RUN_PP_PARALLEL_CHUNK_SOURCE})
+#set(RUN_PP_PARALLEL_CHUNK_SOURCE
+#        src/main_parallel_chunk.c
+#        src/args.c
+#        )
+#add_executable(run_pp_parallel_chunk ${EZNCDF_SOURCE} ${VBN_SOURCE} ${DWCPNC_SOURCE} ${THREADPOOL_SOURCE} ${RUN_PP_PARALLEL_CHUNK_SOURCE})
 
-target_link_libraries(run_pp_parallel_chunk netcdf m pthread)
+#target_link_libraries(run_pp_parallel_chunk netcdf m pthread)
