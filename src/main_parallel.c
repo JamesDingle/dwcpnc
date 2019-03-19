@@ -11,16 +11,12 @@
 
 int main(int argc, char **argv) {
 
-
-
     args_t *args;
     args = parse_args(argc, argv);
 
     if (!validate_args(args)) {
         return EXIT_FAILURE;
     }
-
-
 
     printf("creating queue\n");
     work_queue_t *queue;
@@ -31,8 +27,8 @@ int main(int argc, char **argv) {
     printf("creating pool\n");
     thread_pool_t *pool;
     if (args->nthreads == 0) {
-        printf("Automatic thread count choice....");
-        printf("\tThis system has %d procs configured and %d procss available\n",get_nprocs_conf(), get_nprocs());
+        printf("Automatic thread count choice....\n");
+        printf("\tThis system has %d procs configured and %d procs available\n",get_nprocs_conf(), get_nprocs());
         printf("\tSetting threadpool to use %d cores\n", get_nprocs() / 2);
         printf("initialising pool\n");
         pool = init_thread_pool((uint16_t )(get_nprocs() / 2), queue);
@@ -90,7 +86,6 @@ int main(int argc, char **argv) {
     size_t x, y;
     for (x = 0; x < lon->size; ++x) {
 //    for (x = 0; x < 50; ++x) {
-        float start_time = (float) clock() / CLOCKS_PER_SEC;
         printf("%d/%d\n", (int)x, (int)lon->size);
         for (y = 0; y < lat->size; ++y) {
 
@@ -117,7 +112,7 @@ int main(int argc, char **argv) {
 //            nc_get_vara_float(ncfile->file_handle, file_has_var(ncfile, "lon"), ind1, siz1, &tpos->lon);
 
 
-            tpos->julday = 121;
+            tpos->julday = 180;
 
             nc_get_vara(ncfile->file_handle, bathymetry.index, ind, count, val);
             tpos->bathymetry = *(float *) val;
@@ -215,8 +210,6 @@ int main(int argc, char **argv) {
             }
 
         }
-        float stop_time = (float) clock() / CLOCKS_PER_SEC;
-        printf("Row time: %f\n", (stop_time-start_time));
         pthread_mutex_lock(ncfile->lock);
         nc_sync(ncfile->file_handle);
         pthread_mutex_unlock(ncfile->lock);
@@ -259,13 +252,13 @@ int main(int argc, char **argv) {
     free_queue(queue);
 //    printf("freed\n");
 
-//    printf("Going for one last sync...");
+    printf("Going for one last sync...");
     pthread_mutex_lock(ncfile->lock);
-//    printf("lock acquired...");
+    printf("lock acquired...");
     ncsync(ncfile->file_handle);
-//    printf("sync complete...");
+    printf("sync complete...");
     pthread_mutex_unlock(ncfile->lock);
-//    printf("lock released\n");
+    printf("lock released\n");
 
 
     free_ncfile(ncfile);
@@ -288,9 +281,7 @@ void f(void *params) {
 
         // write chunk row to output file
         pthread_mutex_lock(f_args.inputfile->lock);
-
         nc_put_vara_float(f_args.inputfile->file_handle, file_has_var(f_args.inputfile, "pp"), f_args.ind, f_args.count, &result);
-
 //        nc_sync(f_args.inputfile->file_handle);
         pthread_mutex_unlock(f_args.inputfile->lock);
     }
