@@ -2,6 +2,7 @@
 #define ARRAY_PRODUCT_H
 
 #include <math.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -37,6 +38,7 @@ int add_chunk_to_slice(chunk_t *chunk, slice_t *slice);
 
 int nd_to_1d(int* indices, int* extents, int count);
 
+//void print_ca_array_from_vbn(ca_array_t* ca_array, vbn_t *vbn);
 
 void print_chunk(chunk_t chunk);
 

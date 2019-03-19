@@ -52,76 +52,84 @@
 //
 //}
 
-chunk_array_t *
-gen_chunks(int total_length, int chunk_length) {
-
-//    printf("Total Length: %d\n", total_length);
-//    printf("Chunk Length: %d\n", chunk_length);
-
-    int whole_chunks;
-    whole_chunks = total_length / chunk_length;
-//    printf("Whole chunks: %d\n", whole_chunks);
-
-    int partial_chunks;
-    partial_chunks = total_length % chunk_length ? 1 : 0;
-//    printf("Partial chunks: %d\n", partial_chunks);
-
-    chunk_array_t *chunk_array;
-    chunk_array = (chunk_array_t*)malloc(sizeof(chunk_array_t));
-
-    chunk_array->count = whole_chunks + partial_chunks;
-
-    chunk_array->chunks = (chunk_t**)malloc(sizeof(chunk_t*) * (chunk_array->count));
-
-    int i;
-    for (i=0; i < whole_chunks; ++i) {
-        chunk_t *chunk = (chunk_t*)malloc(sizeof(chunk_t));
-        chunk->start = i * chunk_length;
-        chunk->end = i * chunk_length + chunk_length - 1;
-        chunk_array->chunks[i] = chunk;
-//        print_chunk(*chunk_array->chunks[i]);
-    }
-
-    if (partial_chunks == 1) {
-        i = whole_chunks;
-        chunk_t *chunk = (chunk_t*)malloc(sizeof(chunk_t));
-        chunk->start = i * chunk_length;
-        chunk->end = total_length - 1;
-        chunk_array->chunks[i] = chunk;
-//        print_chunk(*chunk_array->chunks[i]);
-    }
-
-    return chunk_array;
-
-}
-
-int add_chunk_to_slice(chunk_t *chunk, slice_t *slice) {
-
-    return 1;
-}
-
-void print_chunk(chunk_t chunk) {
-    printf("(%d → %d)", chunk.start, chunk.end);
-}
-
-int nd_to_1d(int* indices, int* extents, int count) {
-    int index = 0;
-
-    int i,j;
-    int tmp = 0;
-
-    for (i = 0; i < count; ++i) {
-        tmp = indices[i];
-
-        if (count - i > 0) {
-            for (j = i+1; j < count; ++j) {
-                tmp *= extents[j];
-            }
-            index += tmp;
-        } else {
-            index += tmp;
-        }
-    }
-
-    return index;
-}
+//chunk_array_t *
+//gen_chunks(int total_length, int chunk_length) {
+//
+////    printf("Total Length: %d\n", total_length);
+////    printf("Chunk Length: %d\n", chunk_length);
+//
+//    int whole_chunks;
+//    whole_chunks = total_length / chunk_length;
+////    printf("Whole chunks: %d\n", whole_chunks);
+//
+//    int partial_chunks;
+//    partial_chunks = total_length % chunk_length ? 1 : 0;
+////    printf("Partial chunks: %d\n", partial_chunks);
+//
+//    chunk_array_t *chunk_array;
+//    chunk_array = (chunk_array_t*)malloc(sizeof(chunk_array_t));
+//
+//    chunk_array->count = whole_chunks + partial_chunks;
+//
+//    chunk_array->chunks = (chunk_t**)malloc(sizeof(chunk_t*) * (chunk_array->count));
+//
+//    int i;
+//    for (i=0; i < whole_chunks; ++i) {
+//        chunk_t *chunk = (chunk_t*)malloc(sizeof(chunk_t));
+//        chunk->start = i * chunk_length;
+//        chunk->end = i * chunk_length + chunk_length - 1;
+//        chunk_array->chunks[i] = chunk;
+////        print_chunk(*chunk_array->chunks[i]);
+//    }
+//
+//    if (partial_chunks == 1) {
+//        i = whole_chunks;
+//        chunk_t *chunk = (chunk_t*)malloc(sizeof(chunk_t));
+//        chunk->start = i * chunk_length;
+//        chunk->end = total_length - 1;
+//        chunk_array->chunks[i] = chunk;
+////        print_chunk(*chunk_array->chunks[i]);
+//    }
+//
+//    return chunk_array;
+//
+//}
+//
+//int add_chunk_to_slice(chunk_t *chunk, slice_t *slice) {
+//
+//    return 1;
+//}
+//
+//void print_chunk(chunk_t chunk) {
+//    printf("(%d → %d)", chunk.start, chunk.end);
+//}
+//
+//void print_ca_array_from_vbn(ca_array_t* ca_array, vbn_t *vbn) {
+//    int j;
+//    for (j = 0; j < vbn->digit_count; ++j) {
+//        print_chunk(*ca_array->chunk_arrays[j]->chunks[vbn->digit_value[j]]);
+//        printf(", ");
+//    }
+//}
+//
+//int nd_to_1d(int* indices, int* extents, int count) {
+//    int index = 0;
+//
+//    int i,j;
+//    int tmp = 0;
+//
+//    for (i = 0; i < count; ++i) {
+//        tmp = indices[i];
+//
+//        if (count - i > 0) {
+//            for (j = i+1; j < count; ++j) {
+//                tmp *= extents[j];
+//            }
+//            index += tmp;
+//        } else {
+//            index += tmp;
+//        }
+//    }
+//
+//    return index;
+//}
