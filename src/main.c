@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
     float result;
 
     for (x = 0; x < lon->size; ++x) {
-//        printf("%d/241\n", x);
+//        printf("%d/%d\n", x, lon->size);
         for (y = 0; y < lat->size; ++y) {
             ind[0] = x;
             ind[1] = y;
